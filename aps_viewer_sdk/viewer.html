@@ -57,6 +57,7 @@
   var ACCESS_TOKEN = 'APS_TOKEN_PLACEHOLDER';
   var DOCUMENT_URN = 'urn:URN_PLACEHOLDER';
   var VIEWABLES = VIEWABLES_PLACEHOLDER;
+  var SELECTED_VIEW_GUID = 'SELECTED_VIEW_GUID_PLACEHOLDER';
 
   // Color parsing, supports #rrggbb, 0xrrggbb, rgb(), rgba(); hex is what the backend sends
   function clamp01(x) { return Math.max(0, Math.min(1, x)); }
@@ -255,7 +256,10 @@
         function onSuccess(doc) {
           loadedDocument = doc;
           populateViewDropdown();
-          loadViewByGuid('');
+          if (SELECTED_VIEW_GUID) {
+            document.getElementById('viewDropdown').value = SELECTED_VIEW_GUID;
+          }
+          loadViewByGuid(SELECTED_VIEW_GUID || '');
 
           document.getElementById('viewDropdown').addEventListener('change', function(e) {
             loadViewByGuid(e.target.value);

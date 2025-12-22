@@ -154,8 +154,8 @@ def get_2lo_token(client_id: str, client_secret: str) -> str:
             "grant_type": "client_credentials",
             "client_id": client_id,
             "client_secret": client_secret,
-            "scope": "data:read viewables:read",
-        },
+            "scope": "data:read data:write bucket:create bucket:read bucket:update viewables:read",
+       },
         timeout=30,
     )
     r.raise_for_status()

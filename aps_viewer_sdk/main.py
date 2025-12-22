@@ -22,7 +22,17 @@ class APSViewer:
     
         self.viewables: list[dict[str, Any]] = []
         self.element2highlight: list[ElementsInScene] = []
+        self.selected_view_guid: str | None = None
         self._html_content: str | None = None
+
+    def set_view_guid(
+        self,
+        guid: Annotated[str, "View GUID from the manifest"],
+        name: Annotated[str, "Display name in the view selector"] = "Selected View",
+        role: Annotated[str, "View role, e.g. 3d or 2d"] = "3d",
+    ) -> None:
+        self.selected_view_guid = guid
+        self.viewables = [{"guid": guid, "name": name, "role": role}]
 
     def highlight_elements(self, highlightList: list[ElementsInScene]): 
         self.element2highlight = highlightList
@@ -33,7 +43,7 @@ class APSViewer:
     def build(self) -> None:
         urn_bs64 = to_md_urn(self.urn)
         
-        if self.views_selector:
+        if self.views_selector and not self.viewables:
             self.viewables = self.get_viewables(urn_bs64)
         
         html_path = Path(__file__).resolve().parent / "viewer.html"
@@ -49,6 +59,9 @@ class APSViewer:
         
         viewables_json = json.dumps(self.viewables) if self.viewables else "[]"
         html = html.replace("VIEWABLES_PLACEHOLDER", viewables_json)
+
+        selected_view_guid = self.selected_view_guid or ""
+        html = html.replace("SELECTED_VIEW_GUID_PLACEHOLDER", selected_view_guid)
         
         self._html_content = html
 

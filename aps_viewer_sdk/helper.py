@@ -1,9 +1,14 @@
 import base64
 import requests
-from typing import Any, Annotated
+import time
+from typing import Any, Annotated, TypedDict
 
 APS_BASE_URL = "https://developer.api.autodesk.com"
 MD_BASE_URL = f"{APS_BASE_URL}/modelderivative/v2"
+
+class PropertiesPayload(TypedDict, total=False):
+    data: Annotated[dict[str, Any], "APS properties response payload"]
+
 
 def to_md_urn(wip_urn: str) -> str:
     """Convert WIP URN to Model Derivative URN."""
@@ -155,3 +160,98 @@ def get_2lo_token(client_id: str, client_secret: str) -> str:
     )
     r.raise_for_status()
     return r.json()["access_token"]
+
+
+def get_metadata_viewables(
+    token: str,
+    urn_bs64: Annotated[str, "URN in base64"],
+    *,
+    timeout: int = 60,
+    poll_interval_s: float = 2.0,
+    max_poll_time_s: float = 120.0,
+) -> list[dict[str, Any]]:
+    """
+    Fetch available metadata viewables from GET /{urn}/metadata.
+    """
+    url = f"{MD_BASE_URL}/designdata/{urn_bs64}/metadata"
+    headers = {"Authorization": f"Bearer {token}", "Accept": "application/json"}
+
+    deadline = time.monotonic() + max_poll_time_s
+    while True:
+        resp = requests.get(url, headers=headers, timeout=timeout)
+
+        if resp.status_code == 202:
+            if time.monotonic() >= deadline:
+                raise RuntimeError(f"Timed out waiting for metadata for {url}")
+            time.sleep(poll_interval_s)
+            continue
+
+        resp.raise_for_status()
+        payload = resp.json()
+        break
+
+    data = payload.get("data")
+    if isinstance(data, dict):
+        views = data.get("metadata", [])
+        return views if isinstance(views, list) else []
+
+    if isinstance(data, list):
+        return data
+
+    return []
+
+
+def get_all_model_properties(
+    token: str,
+    urn_bs64: Annotated[str, "URN in base64"],
+    model_guid: str,
+    *,
+    force: bool = False,
+    timeout: int = 60,
+    poll_interval_s: float = 2.0,
+    max_poll_time_s: float = 120.0,
+    session: requests.Session | None = None,
+) -> PropertiesPayload:
+    """
+    Fetch ALL object properties for a translated model view (viewable).
+
+    - calls GET /{urn}/metadata/{modelGuid}/properties.
+    - If the service returns 202 (still processing), it retries until 200 or timeout.
+    - If force=True, sends x-ads-force: true to force re-parsing properties.
+
+    Returns the raw JSON response from the Properties endpoint.
+    """
+    s = session or requests.Session()
+    headers = {
+        "Authorization": f"Bearer {token}",
+        "Accept": "application/json",
+    }
+    if force:
+        headers["x-ads-force"] = "true"
+
+    props_url = f"{MD_BASE_URL}/designdata/{urn_bs64}/metadata/{model_guid}/properties"
+    deadline = time.monotonic() + max_poll_time_s
+    while True:
+        resp = s.get(props_url, headers=headers, timeout=timeout)
+
+        # 202 means: accepted, processing not complete; repeat until 200
+        if resp.status_code == 202:
+            if time.monotonic() >= deadline:
+                raise RuntimeError(
+                    "Timed out waiting for APS Model Derivative to finish processing "
+                    f"(last status 202) for {props_url}"
+                )
+            time.sleep(poll_interval_s)
+            continue
+
+        if resp.status_code >= 400:
+            detail = ""
+            try:
+                detail = resp.json()
+            except Exception:
+                detail = resp.text[:500]
+            raise RuntimeError(
+                f"APS request failed: {resp.status_code} {resp.reason} for {props_url}. Details: {detail}"
+            )
+
+        return resp.json()

@@ -1,0 +1,72 @@
+import json
+import webbrowser
+import tempfile
+from typing import Annotated, TypedDict, Any
+from pathlib import Path
+from .helper import to_md_urn, get_viewables_from_urn
+
+class ElementsInScene(TypedDict):
+    externalElementId: Annotated[str, "External identifier that identifies the elements in the APS viewer. Can be retrieved using the APS Apis"]
+    color: Annotated[str, "HEX color in format #RRGGBB (e.g., #ff0000 for red, #00ff00 for green)"]
+    
+
+class APSViewer:
+    def __init__(self,
+                urn: Annotated[str, "Version URN e.g urn:adsk.wipprod:fs.file:vf.Skn9c5Q?version=1"],
+                token: Annotated[str, "2Lo | 3Lo token"],
+                views_selector: Annotated[bool, "Toggle a view picker"] = True):
+
+        self.urn = urn
+        self.token = token
+        self.views_selector = views_selector  
+    
+        self.viewables: list[dict[str, Any]] = []
+        self.element2highlight: list[ElementsInScene] = []
+        self._html_content: str | None = None
+
+    def highlight_elements(self, highlightList: list[ElementsInScene]): 
+        self.element2highlight = highlightList
+    
+    def get_viewables(self, urn_bs64: Annotated[str, "Version URN in BS64"]) -> list[dict[str, Any]]:
+        return get_viewables_from_urn(self.token, urn_bs64)
+
+    def build(self) -> None:
+        urn_bs64 = to_md_urn(self.urn)
+        
+        if self.views_selector:
+            self.viewables = self.get_viewables(urn_bs64)
+        
+        html_path = Path(__file__).resolve().parent / "viewer.html"
+        html = html_path.read_text(encoding="utf-8")
+        
+        html = html.replace("APS_TOKEN_PLACEHOLDER", self.token)
+        html = html.replace("URN_PLACEHOLDER", urn_bs64)
+        
+        external_ids_json = json.dumps(
+            [{item["externalElementId"]: item["color"]} for item in self.element2highlight]
+        ) if self.element2highlight else "[]"
+        html = html.replace("EXTERNAL_IDS_PLACEHOLDER", external_ids_json)
+        
+        viewables_json = json.dumps(self.viewables) if self.viewables else "[]"
+        html = html.replace("VIEWABLES_PLACEHOLDER", viewables_json)
+        
+        self._html_content = html
+
+    def write(self) -> Annotated[str, "HTML string with the view"]:
+        if self._html_content is None:
+            self.build()
+        return self._html_content
+    
+    def show(self) -> None:
+        html_content = self.write()
+        
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".html", delete=False, encoding="utf-8") as f:
+            f.write(html_content)
+            temp_path = f.name
+        
+        webbrowser.open(f"file://{temp_path}")
+
+
+
+    
+        

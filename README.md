@@ -26,7 +26,7 @@ uv sync --group test
 ## Example: Open Viewer in Browser
 
 ```python
-from aps_viewer_sdk.main import APSViewer
+from aps_viewer_sdk import APSViewer
 from aps_viewer_sdk.helper import get_2lo_token
 
 token = get_2lo_token("CLIENT_ID", "CLIENT_SECRET")  # 2LO; 3LO tokens work too

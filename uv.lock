@@ -13,16 +13,16 @@ wheels = [
 
 [[package]]
 name = "aps-automation-sdk"
-version = "0.1.0"
+version = "0.1.1rc1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "pydantic" },
     { name = "python-dotenv" },
     { name = "requests" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/3a/39/93b6538604b99571d3a07fd266fe5f4695a1ffabf659a44996530413c605/aps_automation_sdk-0.1.0.tar.gz", hash = "sha256:4e6d25785e26695c1b68baa84a4488dc997c46c63d1c72d14b8d9375a209f1d5", size = 55719825, upload-time = "2025-11-12T18:20:32.116Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/42/a2/3e030161c705ec221f5cb876f20fe3f4d0b7e8a3c733c7b1ed176f47c11e/aps_automation_sdk-0.1.1rc1.tar.gz", hash = "sha256:5ce2430bf0405aed1e2d30e76a9b04b6e1103264fdc2b60876e68eb7bfc27dc2", size = 64070183, upload-time = "2025-12-24T23:30:08.391Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/2a/61/811563f068686cdd1017b0a01197c3d1b0a4fee40a409c0827b84a680caf/aps_automation_sdk-0.1.0-py3-none-any.whl", hash = "sha256:2142f5e8736dd8d767a36944d126d18e20b88d541c986120972f38d782f90915", size = 15008, upload-time = "2025-11-12T18:20:23.281Z" },
+    { url = "https://files.pythonhosted.org/packages/9c/23/346e24fc1e4707f2940cf87f203922c14fee8dacc7bc0aa9f1a08962b735/aps_automation_sdk-0.1.1rc1-py3-none-any.whl", hash = "sha256:aabb7560567f736056a0132eb295d5ed78a5fe80fa9fa387b3c9db8fa3959365", size = 16602, upload-time = "2025-12-24T23:29:59.87Z" },
 ]
 
 [[package]]
@@ -30,6 +30,7 @@ name = "aps-viewer-sdk"
 version = "0.1.0"
 source = { editable = "." }
 dependencies = [
+    { name = "aps-automation-sdk" },
     { name = "requests" },
 ]
 
@@ -44,7 +45,10 @@ test = [
 ]
 
 [package.metadata]
-requires-dist = [{ name = "requests", specifier = ">=2.32.5" }]
+requires-dist = [
+    { name = "aps-automation-sdk", specifier = "==0.1.1rc1" },
+    { name = "requests", specifier = ">=2.32.5" },
+]
 
 [package.metadata.requires-dev]
 examples = [

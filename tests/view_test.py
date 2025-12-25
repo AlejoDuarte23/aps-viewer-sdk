@@ -6,7 +6,7 @@ import webbrowser
 from typing import cast
 from pathlib import Path
 from dotenv import load_dotenv
-from aps_viewer_sdk.main import APSViewer, ElementsInScene
+from aps_viewer_sdk import APSViewer, ElementsInScene
 from aps_viewer_sdk.helper import (
     to_md_urn,
     get_2lo_token,

@@ -31,3 +31,7 @@ packages = ["aps_viewer_sdk"]
 
 [tool.uv.sources]
 aps-viewer-sdk = { workspace = true }
+
+[tool.pytest.ini_options]
+testpaths = ["tests/unit"]
+addopts = ["-v"]

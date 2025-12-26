@@ -33,3 +33,11 @@ jobs:
 
       - name: Run tests (unit only, no secrets)
         run: uv run pytest tests/unit/
+
+      - name: Run tests (integration, with secrets)
+        if: github.event.pull_request.head.repo.full_name == github.repository || github.ref == 'refs/heads/main'
+        env:
+          CLIENT_ID: ${{ secrets.CLIENT_ID }}
+          CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
+          TEST_URN: ${{ secrets.TEST_URN }}
+        run: uv run --group test pytest tests/integration/ -v

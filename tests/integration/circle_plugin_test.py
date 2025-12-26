@@ -8,6 +8,7 @@ from aps_viewer_sdk import APSViewer
 from aps_viewer_sdk.plugins import Draw2DCircles
 
 
+@pytest.mark.requires_secrets
 def test_draw_2d_circles_plugin_is_injected_into_html() -> None:
     load_dotenv()
     client_id = os.getenv("CLIENT_ID")

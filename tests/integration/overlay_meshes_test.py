@@ -8,6 +8,7 @@ from aps_viewer_sdk import APSViewer
 from aps_viewer_sdk.plugins import OverlayMeshes
 
 
+@pytest.mark.requires_secrets
 def make_tree_plugin() -> OverlayMeshes:
     trees = OverlayMeshes(scene_id="trees-overlay")
     specs = [
@@ -70,6 +71,7 @@ def make_tree_plugin() -> OverlayMeshes:
     return trees
 
 
+@pytest.mark.requires_secrets
 def test_overlay_meshes_plugin_is_injected_into_html() -> None:
     load_dotenv()
     client_id = os.getenv("CLIENT_ID")

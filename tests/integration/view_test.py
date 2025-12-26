@@ -15,6 +15,7 @@ from aps_viewer_sdk.helper import (
 )
 
 
+@pytest.mark.requires_secrets
 def test_show_opens_html_in_browser(monkeypatch) -> None:
     load_dotenv()
     test_urn = os.getenv("TEST_URN")
@@ -47,6 +48,7 @@ def test_show_opens_html_in_browser(monkeypatch) -> None:
     assert f"urn:{to_md_urn(viewer.urn)}" in html
 
 
+@pytest.mark.requires_secrets
 def test_view_names_are_injected_into_html() -> None:
     load_dotenv()
     client_id = os.getenv("CLIENT_ID")
@@ -68,6 +70,7 @@ def test_view_names_are_injected_into_html() -> None:
     assert any(v["name"] in html for v in viewer.viewables)
 
 
+@pytest.mark.requires_secrets
 def test_select_first_view_and_highlight_elements() -> None:
     load_dotenv()
     client_id = os.getenv("CLIENT_ID")

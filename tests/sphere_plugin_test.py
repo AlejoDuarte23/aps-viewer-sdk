@@ -37,5 +37,7 @@ def test_draw_3d_spheres_plugin_is_injected_into_html() -> None:
     assert '"color": "#00ff00"' in html
 
     assert 'const EXT_ID = "My.SphereMarkers";' in html
+
+
 if __name__ == "__main__":
     test_draw_3d_spheres_plugin_is_injected_into_html()

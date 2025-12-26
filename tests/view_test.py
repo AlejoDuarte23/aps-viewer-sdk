@@ -106,7 +106,9 @@ def test_select_first_view_and_highlight_elements() -> None:
 
     payload: dict[str, object] = get_all_model_properties(token, urn_bs64, model_guid)
     data_raw = payload.get("data")
-    data: dict[str, object] = cast(dict[str, object], data_raw if isinstance(data_raw, dict) else payload)
+    data: dict[str, object] = cast(
+        dict[str, object], data_raw if isinstance(data_raw, dict) else payload
+    )
     collection = data.get("collection", [])
 
     seen: set[str] = set()
@@ -124,9 +126,7 @@ def test_select_first_view_and_highlight_elements() -> None:
     rng = random.Random(0)
     highlight: list[ElementsInScene] = []
     for ext_id in external_ids[:3]:
-        color = "#{:02x}{:02x}{:02x}".format(
-            rng.randrange(256), rng.randrange(256), rng.randrange(256)
-        )
+        color = f"#{rng.randrange(256):02x}{rng.randrange(256):02x}{rng.randrange(256):02x}"
         highlight.append({"externalElementId": ext_id, "color": color})
 
     viewer.highlight_elements(highlight)

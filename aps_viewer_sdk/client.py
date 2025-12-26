@@ -21,7 +21,9 @@ class ElementsInScene(TypedDict):
 class APSViewer:
     def __init__(
         self,
-        urn: Annotated[str, "Version URN e.g urn:adsk.wipprod:fs.file:vf.Skn9c5Q?version=1"],
+        urn: Annotated[
+            str, "Version URN e.g urn:adsk.wipprod:fs.file:vf.Skn9c5Q?version=1"
+        ],
         token: Annotated[str, "2Lo | 3Lo token"],
         views_selector: Annotated[bool, "Toggle a view picker"] = True,
     ):
@@ -70,7 +72,10 @@ class APSViewer:
 
         external_ids_json = (
             json.dumps(
-                [{item["externalElementId"]: item["color"]} for item in self.element2highlight]
+                [
+                    {item["externalElementId"]: item["color"]}
+                    for item in self.element2highlight
+                ]
             )
             if self.element2highlight
             else "[]"
@@ -99,9 +104,7 @@ class APSViewer:
         )
         html = html.replace("PLUGINS_PLACEHOLDER", plugins_json)
 
-        plugin_scripts = [
-            f"<script>\n{p.js_content}\n</script>" for p in self._plugins
-        ]
+        plugin_scripts = [f"<script>\n{p.js_content}\n</script>" for p in self._plugins]
         html = html.replace("PLUGINS_JS_PLACEHOLDER", "\n".join(plugin_scripts))
 
         self._html_content = html

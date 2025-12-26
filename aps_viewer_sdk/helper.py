@@ -6,6 +6,7 @@ from typing import Any, Annotated, TypedDict
 APS_BASE_URL = "https://developer.api.autodesk.com"
 MD_BASE_URL = f"{APS_BASE_URL}/modelderivative/v2"
 
+
 class PropertiesPayload(TypedDict, total=False):
     data: Annotated[dict[str, Any], "APS properties response payload"]
 
@@ -23,14 +24,14 @@ def get_revit_version_from_manifest(manifest: dict) -> str | None:
         derivatives = manifest.get("derivatives", [])
         if not derivatives:
             return None
-        
+
         for derivative in derivatives:
             properties = derivative.get("properties", {})
             doc_info = properties.get("Document Information", {})
             rvt_version = doc_info.get("RVTVersion")
             if rvt_version:
                 return str(rvt_version)
-        
+
         return None
     except Exception as e:
         print(f"Error extracting Revit version from manifest: {e}")
@@ -49,18 +50,20 @@ def fetch_manifest(autodesk_file_param, token):
     return resp.json()
 
 
-def get_viewables_from_urn(token:str, object_urn: Annotated[str, "URN in bs64"]) -> list[dict[str, Any]]:
+def get_viewables_from_urn(
+    token: str, object_urn: Annotated[str, "URN in bs64"]
+) -> list[dict[str, Any]]:
     """
     Get available viewables (views) from a translated model.
     """
-    
+
     response = requests.get(
         f"{MD_BASE_URL}/designdata/{object_urn}/manifest",
         headers={"Authorization": f"Bearer {token}"},
-        timeout=30
+        timeout=30,
     )
     response.raise_for_status()
-    
+
     manifest = response.json()
     viewables: list[dict[str, Any]] = []
 
@@ -111,7 +114,6 @@ def get_viewables_from_urn(token:str, object_urn: Annotated[str, "URN in bs64"])
         seen.add(key)
         viewables.append({"guid": guid, "name": display_name, "role": role})
 
-
     return viewables
 
 
@@ -122,11 +124,13 @@ def get_view_names_from_manifest(manifest: dict) -> list[str]:
     """
     seen = set()
     view_names = []
-    
+
     for derivative in manifest.get("derivatives", []):
         if derivative.get("outputType") in ["svf", "svf2"]:
             for geometry_node in derivative.get("children", []):
-                if geometry_node.get("type") == "geometry" and geometry_node.get("role") in ["3d", "2d"]:
+                if geometry_node.get("type") == "geometry" and geometry_node.get(
+                    "role"
+                ) in ["3d", "2d"]:
                     # base name is the geometry node name
                     base_name = geometry_node.get("name", "")
                     candidate_names = [base_name]
@@ -143,9 +147,10 @@ def get_view_names_from_manifest(manifest: dict) -> list[str]:
                         if clean not in seen:
                             seen.add(clean)
                             view_names.append(clean)
-    
+
     print(f"Found {len(view_names)} view name(s) in manifest")
     return view_names
+
 
 def get_2lo_token(client_id: str, client_secret: str) -> str:
     r = requests.post(
@@ -155,7 +160,7 @@ def get_2lo_token(client_id: str, client_secret: str) -> str:
             "client_id": client_id,
             "client_secret": client_secret,
             "scope": "data:read data:write bucket:create bucket:read bucket:update viewables:read",
-       },
+        },
         timeout=30,
     )
     r.raise_for_status()

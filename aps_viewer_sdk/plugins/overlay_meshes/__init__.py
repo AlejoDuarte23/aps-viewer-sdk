@@ -1,8 +1,9 @@
 from __future__ import annotations
 
+from collections.abc import Sequence
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, Sequence
+from typing import Any
 
 from ..base import PluginSpec
 
@@ -24,7 +25,11 @@ class OverlayMeshes:
             {
                 "type": "box",
                 "sceneId": self.scene_id,
-                "position": [float(position[0]), float(position[1]), float(position[2])],
+                "position": [
+                    float(position[0]),
+                    float(position[1]),
+                    float(position[2]),
+                ],
                 "width": float(size[0]),
                 "height": float(size[1]),
                 "depth": float(size[2]),
@@ -46,7 +51,11 @@ class OverlayMeshes:
             {
                 "type": "sphere",
                 "sceneId": self.scene_id,
-                "position": [float(position[0]), float(position[1]), float(position[2])],
+                "position": [
+                    float(position[0]),
+                    float(position[1]),
+                    float(position[2]),
+                ],
                 "radius": float(radius),
                 "segments": int(segments),
                 "color": color,
@@ -68,7 +77,11 @@ class OverlayMeshes:
             {
                 "type": "cone",
                 "sceneId": self.scene_id,
-                "position": [float(position[0]), float(position[1]), float(position[2])],
+                "position": [
+                    float(position[0]),
+                    float(position[1]),
+                    float(position[2]),
+                ],
                 "radius": float(radius),
                 "height": float(height),
                 "radialSegments": int(radial_segments),

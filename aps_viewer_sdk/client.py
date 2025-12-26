@@ -112,6 +112,7 @@ class APSViewer:
     def write(self) -> Annotated[str, "HTML string with the view"]:
         if self._html_content is None:
             self.build()
+        assert self._html_content is not None
         return self._html_content
 
     def show(self) -> None:

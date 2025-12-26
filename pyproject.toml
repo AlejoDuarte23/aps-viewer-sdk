@@ -19,6 +19,7 @@ test = [
     "python-dotenv>=1.2.1",
     "pre-commit>=2.20.0",
     "ruff>=0.0.274",
+    "mypy>=1.19.1",
 ]
 
 [build-system]

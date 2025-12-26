@@ -14,7 +14,7 @@ class Draw2DCircles:
     def spec(self) -> PluginSpec:
         js_path = Path(__file__).resolve().parent / "circle_markers_2d.js"
         js_content = js_path.read_text(encoding="utf-8")
-        
+
         return PluginSpec(
             extension_id="My.CircleMarkers",
             only_2d=True,

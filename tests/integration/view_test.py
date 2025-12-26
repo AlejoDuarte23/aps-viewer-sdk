@@ -126,7 +126,9 @@ def test_select_first_view_and_highlight_elements() -> None:
     rng = random.Random(0)
     highlight: list[ElementsInScene] = []
     for ext_id in external_ids[:3]:
-        color = f"#{rng.randrange(256):02x}{rng.randrange(256):02x}{rng.randrange(256):02x}"
+        color = (
+            f"#{rng.randrange(256):02x}{rng.randrange(256):02x}{rng.randrange(256):02x}"
+        )
         highlight.append({"externalElementId": ext_id, "color": color})
 
     viewer.highlight_elements(highlight)

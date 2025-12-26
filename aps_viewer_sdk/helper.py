@@ -1,5 +1,5 @@
 import base64
-import requests
+import requests  # type: ignore[import-untyped]
 import time
 from typing import Any, Annotated, TypedDict
 

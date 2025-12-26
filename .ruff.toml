@@ -27,7 +27,7 @@ exclude = [
 line-length = 88
 output-format = "grouped"
 
-target-version = "py39"
+target-version = "py312"
 
 [lint]
 select = [

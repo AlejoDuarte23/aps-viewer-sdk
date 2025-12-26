@@ -35,3 +35,6 @@ aps-viewer-sdk = { workspace = true }
 [tool.pytest.ini_options]
 testpaths = ["tests/unit"]
 addopts = ["-v"]
+markers = [
+    "requires_secrets: tests that need APS credentials and will be skipped in CI without secrets",
+]

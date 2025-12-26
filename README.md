@@ -1,5 +1,11 @@
 # APS Viewer SDK
 
+[![PyPI version](https://badge.fury.io/py/aps-viewer-sdk.svg)](https://badge.fury.io/py/aps-viewer-sdk)
+[![CI](https://github.com/AlejoDuarte23/aps-viewer-sdk/actions/workflows/ci.yml/badge.svg)](https://github.com/AlejoDuarte23/aps-viewer-sdk/actions/workflows/ci.yml)
+[![Python 3.12+](https://img.shields.io/badge/python-3.12+-blue.svg)](https://www.python.org/downloads/)
+[![Code style: ruff](https://img.shields.io/badge/code%20style-ruff-000000.svg)](https://github.com/astral-sh/ruff)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 Lightweight Python helper to render APS models in the browser with powerful built-in plugins for visualization and interaction.
 
 ## Features
@@ -51,11 +57,26 @@ Enable interactive circle markers on 2D views for annotations and markup.
 - **Interactive markup** - Annotate 2D drawings with circle markers
 - **Integrations** with Model Properties API, Model Derivative, Data Exchange API, and AEC Data Model API
 
-## Install
+## Installation
 
-Requires `uv` (install: https://docs.astral.sh/uv/).
+### For Users
 
 ```bash
+pip install aps-viewer-sdk
+```
+
+Or with `uv`:
+```bash
+uv add aps-viewer-sdk
+```
+
+### For Development
+
+Clone the repository and install dependencies:
+
+```bash
+git clone https://github.com/AlejoDuarte23/aps-viewer-sdk.git
+cd aps-viewer-sdk
 uv sync
 uv sync --group test
 ```
@@ -98,7 +119,21 @@ viewer.show()
 
 ## Examples
 
-The `example/` folder contains comprehensive Jupyter notebooks demonstrating all features:
+The `example/` folder contains comprehensive Jupyter notebooks demonstrating all features.
+
+**Setup for examples:**
+```bash
+# Clone the repository
+git clone https://github.com/AlejoDuarte23/aps-viewer-sdk.git
+cd aps-viewer-sdk
+
+# Install dependencies including examples group
+uv sync --group examples
+
+# Create .env file with your APS credentials
+cp .env.example .env
+# Edit .env with your CLIENT_ID, CLIENT_SECRET, TEST_URN
+```
 
 ### 1. Highlight Elements in Scene
 `example/1 - highlight_elements_in_scene/color_elements_from_scene.ipynb`
@@ -120,5 +155,7 @@ The `example/` folder contains comprehensive Jupyter notebooks demonstrating all
 - Click-to-place circle markers on floor plans and elevations
 - Customize circle appearance (radius, color)
 - Ideal for markup and inspection workflows
+
+Each notebook includes detailed explanations, parameter documentation, and use case examples.
 
 Each notebook includes detailed explanations, parameter documentation, and use case examples.

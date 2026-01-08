@@ -11,11 +11,15 @@ class PropertiesPayload(TypedDict, total=False):
     data: Annotated[dict[str, Any], "APS properties response payload"]
 
 
-def to_md_urn(wip_urn: str) -> str:
-    """Convert WIP URN to Model Derivative URN."""
-    raw = wip_urn.split("?", 1)[0]
-    encoded = base64.urlsafe_b64encode(raw.encode("utf8")).decode("utf8")
-    return encoded.rstrip("=")
+def to_md_urn(value: str) -> str:
+    """
+    Convert URN to base64-encoded format for APS viewer.
+    Supports both regular URNs and version URNs (ACC/BIM360).
+    """
+    if value.startswith("urn:"):
+        encoded = base64.urlsafe_b64encode(value.encode("utf-8")).decode("utf-8")
+        return encoded.rstrip("=")
+    return value.rstrip("=")
 
 
 def get_revit_version_from_manifest(manifest: dict) -> str | None:

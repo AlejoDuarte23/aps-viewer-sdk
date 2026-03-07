@@ -1,0 +1,4 @@
+interface:
+  display_name: "APS Viewer Basic"
+  short_description: "Load views and highlight APS elements safely."
+  default_prompt: "Use this skill to implement or fix basic aps-viewer-sdk flows: initialize APSViewer, pick a view, highlight elements by externalId, and render output with write/show."

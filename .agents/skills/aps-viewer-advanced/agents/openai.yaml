@@ -1,0 +1,4 @@
+interface:
+  display_name: "APS Viewer Advanced"
+  short_description: "Build plugins and complex APS Viewer workflows."
+  default_prompt: "Use this skill for advanced aps-viewer-sdk tasks: compose plugins, configure overlay meshes and markers, verify plugin injection, and debug complex viewer integrations."

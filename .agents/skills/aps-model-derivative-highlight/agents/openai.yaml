@@ -1,0 +1,4 @@
+interface:
+  display_name: "APS Model Derivative Highlight"
+  short_description: "Integrate Model Derivative data with viewer highlights."
+  default_prompt: "Use this skill to implement notebook-style workflows that translate a model, read Model Derivative metadata/properties, extract external IDs, and pass highlight payloads into APSViewer."

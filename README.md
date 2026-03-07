@@ -69,9 +69,47 @@ Or with `uv`:
 ```bash
 uv add aps-viewer-sdk
 ```
+### For Agents
+This repository publishes skills in:
+```text
+.agents/skills/aps-model-derivative-highlight/
+.agents/skills/aps-viewer-advanced/
+.agents/skills/aps-viewer-basic/
+```
+- `.agents/skills/aps-model-derivative-highlight/`: Use this skill to implement notebook-style workflows that translate a model, read Model Derivative metadata/properties, extract external IDs, and pass highlight payloads into APSViewer.
+- `.agents/skills/aps-viewer-advanced/`: Use this skill for advanced aps-viewer-sdk tasks: compose plugins, configure overlay meshes and markers, verify plugin injection, and debug complex viewer integrations.
+- `.agents/skills/aps-viewer-basic/`: Use this skill to implement or fix basic aps-viewer-sdk flows: initialize APSViewer, pick a view, highlight elements by externalId, and render output with write/show.
+
+#### For codex
+Codex reads project skills from `.agents/skills/`.
+
+For your local repo:
+
+```bash
+npx skills add https://github.com/AlejoDuarte23/aps-viewer-sdk \
+  --skill aps-model-derivative-highlight \
+  --skill aps-viewer-advanced \
+  --skill aps-viewer-basic \
+  --copy \
+  -a codex \
+  -y
+```
+This copies the skills into: `.agents/skills/`
+
+### For Claude Code
+```bash
+npx skills add https://github.com/AlejoDuarte23/aps-viewer-sdk \
+  --skill aps-model-derivative-highlight \
+  --skill aps-viewer-advanced \
+  --skill aps-viewer-basic \
+  --copy \
+  -a claude-code \
+  -yy
+```
+
+This copies the skills into: `.claude/skills`
 
 ### For Development
-
 Clone the repository and install dependencies:
 
 ```bash
@@ -155,7 +193,5 @@ cp .env.example .env
 - Click-to-place circle markers on floor plans and elevations
 - Customize circle appearance (radius, color)
 - Ideal for markup and inspection workflows
-
-Each notebook includes detailed explanations, parameter documentation, and use case examples.
 
 Each notebook includes detailed explanations, parameter documentation, and use case examples.

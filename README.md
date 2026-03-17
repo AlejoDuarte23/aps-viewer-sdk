@@ -165,7 +165,7 @@ The `example/` folder contains comprehensive Jupyter notebooks demonstrating all
 git clone https://github.com/AlejoDuarte23/aps-viewer-sdk.git
 cd aps-viewer-sdk
 
-# Install dependencies including examples group
+# Install dependencies including notebook/example dependencies
 uv sync --group examples
 
 # Create .env file with your APS credentials

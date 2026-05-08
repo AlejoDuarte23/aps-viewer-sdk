@@ -11,6 +11,21 @@ class PropertiesPayload(TypedDict, total=False):
     data: Annotated[dict[str, Any], "APS properties response payload"]
 
 
+def get_model_derivative_headers(
+    token: str,
+    *,
+    region: str = "US",
+    accept_json: bool = False,
+) -> dict[str, str]:
+    headers = {
+        "Authorization": f"Bearer {token}",
+        "region": region,
+    }
+    if accept_json:
+        headers["Accept"] = "application/json"
+    return headers
+
+
 def to_md_urn(value: str) -> str:
     """
     Convert URN to base64-encoded format for APS viewer.
@@ -42,20 +57,27 @@ def get_revit_version_from_manifest(manifest: dict) -> str | None:
         return None
 
 
-def fetch_manifest(autodesk_file_param, token):
+def fetch_manifest(
+    autodesk_file_param,
+    token,
+    region: str = "US",
+):
     """Fetch model derivative manifest."""
     version = autodesk_file_param.get_latest_version(token)
     urn = version.urn
     encoded_urn = base64.urlsafe_b64encode(urn.encode()).decode().rstrip("=")
-    url = f"https://developer.api.autodesk.com/modelderivative/v2/designdata/{encoded_urn}/manifest"
-    headers = {"Authorization": f"Bearer {token}"}
+    url = f"{MD_BASE_URL}/designdata/{encoded_urn}/manifest"
+    headers = get_model_derivative_headers(token, region=region)
     resp = requests.get(url, headers=headers, timeout=30)
     resp.raise_for_status()
     return resp.json()
 
 
 def get_viewables_from_urn(
-    token: str, object_urn: Annotated[str, "URN in bs64"]
+    token: str,
+    object_urn: Annotated[str, "URN in bs64"],
+    *,
+    region: str = "US",
 ) -> list[dict[str, Any]]:
     """
     Get available viewables (views) from a translated model.
@@ -63,7 +85,7 @@ def get_viewables_from_urn(
 
     response = requests.get(
         f"{MD_BASE_URL}/designdata/{object_urn}/manifest",
-        headers={"Authorization": f"Bearer {token}"},
+        headers=get_model_derivative_headers(token, region=region),
         timeout=30,
     )
     response.raise_for_status()
@@ -175,6 +197,7 @@ def get_metadata_viewables(
     token: str,
     urn_bs64: Annotated[str, "URN in base64"],
     *,
+    region: str = "US",
     timeout: int = 60,
     poll_interval_s: float = 2.0,
     max_poll_time_s: float = 120.0,
@@ -183,7 +206,7 @@ def get_metadata_viewables(
     Fetch available metadata viewables from GET /{urn}/metadata.
     """
     url = f"{MD_BASE_URL}/designdata/{urn_bs64}/metadata"
-    headers = {"Authorization": f"Bearer {token}", "Accept": "application/json"}
+    headers = get_model_derivative_headers(token, region=region, accept_json=True)
 
     deadline = time.monotonic() + max_poll_time_s
     while True:
@@ -215,6 +238,7 @@ def get_all_model_properties(
     urn_bs64: Annotated[str, "URN in base64"],
     model_guid: str,
     *,
+    region: str = "US",
     force: bool = False,
     timeout: int = 60,
     poll_interval_s: float = 2.0,
@@ -231,10 +255,7 @@ def get_all_model_properties(
     Returns the raw JSON response from the Properties endpoint.
     """
     s = session or requests.Session()
-    headers = {
-        "Authorization": f"Bearer {token}",
-        "Accept": "application/json",
-    }
+    headers = get_model_derivative_headers(token, region=region, accept_json=True)
     if force:
         headers["x-ads-force"] = "true"
 

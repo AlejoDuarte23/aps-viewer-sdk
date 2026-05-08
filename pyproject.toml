@@ -1,6 +1,6 @@
 [project]
 name = "aps-viewer-sdk"
-version = "0.1.2"
+version = "0.1.3"
 description = "Lightweight Python helper to render APS models in the browser with built-in visualization plugins."
 readme = "README.md"
 requires-python = ">=3.12"

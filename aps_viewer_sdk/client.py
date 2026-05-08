@@ -4,7 +4,10 @@ import webbrowser
 from pathlib import Path
 from typing import Annotated, Any, TypedDict
 
-from .helper import get_viewables_from_urn, to_md_urn
+from .helper import (
+    get_viewables_from_urn,
+    to_md_urn,
+)
 from .plugins.base import PluginSpec
 
 
@@ -26,10 +29,15 @@ class APSViewer:
         ],
         token: Annotated[str, "2Lo | 3Lo token"],
         views_selector: Annotated[bool, "Toggle a view picker"] = True,
+        region: Annotated[
+            str,
+            "APS Model Derivative region for manifest and derivative metadata",
+        ] = "US",
     ):
         self.urn = urn
         self.token = token
         self.views_selector = views_selector
+        self.region = region
 
         self.viewables: list[dict[str, Any]] = []
         self.element2highlight: list[ElementsInScene] = []
@@ -54,9 +62,17 @@ class APSViewer:
         self.element2highlight = highlightList
 
     def get_viewables(
-        self, urn_bs64: Annotated[str, "Version URN in BS64"]
+        self,
+        urn_bs64: Annotated[str, "Version URN in BS64"],
+        *,
+        region: Annotated[
+            str | None,
+            "Override APS Model Derivative region for this request",
+        ] = None,
     ) -> list[dict[str, Any]]:
-        return get_viewables_from_urn(self.token, urn_bs64)
+        return get_viewables_from_urn(
+            self.token, urn_bs64, region=region or self.region
+        )
 
     def build(self) -> None:
         urn_bs64 = to_md_urn(self.urn)

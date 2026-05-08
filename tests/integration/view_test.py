@@ -54,6 +54,7 @@ def test_view_names_are_injected_into_html() -> None:
     client_id = os.getenv("CLIENT_ID")
     client_secret = os.getenv("CLIENT_SECRET")
     test_urn = os.getenv("TEST_URN")
+    region = os.getenv("APS_MODEL_DERIVATIVE_REGION", "US")
     if not client_id or not client_secret or not test_urn:
         pytest.skip("Missing CLIENT_ID/CLIENT_SECRET/TEST_URN for live viewables test")
 
@@ -62,6 +63,7 @@ def test_view_names_are_injected_into_html() -> None:
         urn=test_urn,
         token=token,
         views_selector=True,
+        region=region,
     )
 
     html = viewer.write()
@@ -76,6 +78,7 @@ def test_select_first_view_and_highlight_elements() -> None:
     client_id = os.getenv("CLIENT_ID")
     client_secret = os.getenv("CLIENT_SECRET")
     test_urn = os.getenv("TEST_URN")
+    region = os.getenv("APS_MODEL_DERIVATIVE_REGION", "US")
     if not client_id or not client_secret or not test_urn:
         pytest.skip("Missing CLIENT_ID/CLIENT_SECRET/TEST_URN for live highlight test")
 
@@ -86,6 +89,7 @@ def test_select_first_view_and_highlight_elements() -> None:
         urn=test_urn,
         token=token,
         views_selector=True,
+        region=region,
     )
     viewables = viewer.get_viewables(urn_bs64)
     if not viewables:
@@ -96,7 +100,7 @@ def test_select_first_view_and_highlight_elements() -> None:
         pytest.skip("No 3d viewables returned for TEST_URN")
     viewer.set_view_guid(first_view["guid"], first_view["name"], first_view["role"])
 
-    metadata_views = get_metadata_viewables(token, urn_bs64)
+    metadata_views = get_metadata_viewables(token, urn_bs64, region=region)
     if not metadata_views:
         pytest.skip("No metadata viewables returned for TEST_URN")
 
@@ -107,7 +111,9 @@ def test_select_first_view_and_highlight_elements() -> None:
     if not model_guid:
         pytest.skip("No valid model GUID available for metadata properties")
 
-    payload: dict[str, object] = get_all_model_properties(token, urn_bs64, model_guid)
+    payload: dict[str, object] = get_all_model_properties(
+        token, urn_bs64, model_guid, region=region
+    )
     data_raw = payload.get("data")
     data: dict[str, object] = cast(
         dict[str, object], data_raw if isinstance(data_raw, dict) else payload

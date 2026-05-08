@@ -136,6 +136,18 @@ viewer = APSViewer(
 viewer.show()
 ```
 
+Model Derivative helper calls default to the `US` region. For translated data stored
+outside the US, pass the APS region used for the derivatives:
+
+```python
+viewer = APSViewer(
+    urn="urn:...",
+    token=token,
+    views_selector=True,
+    region="EMEA",  # Also supports AUS, CAN, DEU, IND, JPN, and GBR
+)
+```
+
 ### Using Built-in Plugins
 
 ```python

@@ -264,6 +264,7 @@ cp .env.example .env
 - Ideal for markup and inspection workflows
 
 ### 4. Compare Model Versions
+`example/4 - compare_model_versions/compare_model_versions.ipynb`
 - Use `APSViewer.compare_with(...)` for split-view model comparison
 - Pass normalized `ChangesInput` items from your diff workflow
 - Color-code added, removed, and modified elements with the default palette

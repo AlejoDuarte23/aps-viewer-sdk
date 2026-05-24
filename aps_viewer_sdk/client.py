@@ -1,9 +1,11 @@
 import json
 import tempfile
 import webbrowser
+from collections.abc import Mapping
 from pathlib import Path
-from typing import Annotated, Any, TypedDict
+from typing import Annotated, Any, Literal, TypedDict
 
+from .diff import ChangesInput
 from .helper import (
     get_viewables_from_urn,
     to_md_urn,
@@ -48,6 +50,73 @@ class APSViewer:
 
     def add_plugin(self, plugin_spec: PluginSpec) -> None:
         self._plugins.append(plugin_spec)
+        self._html_content = None
+
+    def compare_with(
+        self,
+        base_urn: Annotated[
+            str,
+            "Base/previous version URN to load as a reference model for comparison",
+        ],
+        changes: Annotated[
+            ChangesInput,
+            "Normalized model diff changes or a ModelDiffChangeSet",
+        ],
+        *,
+        base_label: Annotated[
+            str | None,
+            "Optional short label shown for the base side of the comparison",
+        ] = None,
+        target_label: Annotated[
+            str | None,
+            "Optional short label shown for the target/current side of the comparison",
+        ] = None,
+        colors: Annotated[
+            Mapping[Literal["added", "removed", "modified"], str] | None,
+            "Optional HEX color overrides keyed by added, removed, or modified",
+        ] = None,
+        default_mode: Annotated[
+            Literal["overlay", "split"],
+            "Initial comparison layout: overlay in one viewer or split in two viewers",
+        ] = "overlay",
+        legend: Annotated[
+            bool,
+            "Whether to render the in-view diff controls and change badges",
+        ] = True,
+        list_mode: Annotated[
+            Literal["external", "drawer", "none"],
+            "Change list presentation mode: external, drawer, or none",
+        ] = "external",
+        base_view_guid: Annotated[
+            str | None,
+            "Optional base model view GUID to match the selected target view",
+        ] = None,
+        sync_views: Annotated[
+            bool,
+            "Whether split viewers keep camera/navigation state synchronized",
+        ] = True,
+        default_visibility: Annotated[
+            Mapping[Literal["unchanged"], Literal["visible", "hidden"]] | None,
+            "Initial visibility policy for unchanged elements",
+        ] = None,
+    ) -> None:
+        from .plugins import ModelDiff
+
+        self.add_plugin(
+            ModelDiff(
+                base_urn=base_urn,
+                changes=changes,
+                base_label=base_label,
+                target_label=target_label,
+                colors=colors,
+                default_mode=default_mode,
+                legend=legend,
+                list_mode=list_mode,
+                base_view_guid=base_view_guid,
+                sync_views=sync_views,
+                default_visibility=default_visibility,
+            ).spec()
+        )
 
     def set_view_guid(
         self,
@@ -57,9 +126,11 @@ class APSViewer:
     ) -> None:
         self.selected_view_guid = guid
         self.viewables = [{"guid": guid, "name": name, "role": role}]
+        self._html_content = None
 
     def highlight_elements(self, highlightList: list[ElementsInScene]):
         self.element2highlight = highlightList
+        self._html_content = None
 
     def get_viewables(
         self,

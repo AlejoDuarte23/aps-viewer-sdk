@@ -18,7 +18,7 @@ Lightweight Python helper to render APS models in the browser with powerful buil
 
 ### Built-in Plugins
 
-The SDK includes three powerful plugins (from `aps_viewer_sdk.plugins`) for extending viewer functionality:
+The SDK includes four powerful plugins (from `aps_viewer_sdk.plugins`) for extending viewer functionality:
 
 #### 1. Element Highlighting
 Programmatically highlight and color model elements for visual analysis and QA/QC workflows.
@@ -50,8 +50,21 @@ Enable interactive circle markers on 2D views for annotations and markup.
 - Perfect for marking inspection points, issues, or locations of interest
 - Works exclusively on 2D views (floor plans, elevations, sections)
 
+#### 4. ModelDiff Plugin
+Compare model versions with split viewers and color-coded change badges.
+
+![Model Diff Comparison](assets/example4.png)
+*Show added, removed, and modified elements across two model versions*
+
+**Key Features:**
+- Compare a base model version against a target/current model version
+- Color-code added, removed, and modified elements by `externalId`
+- Use split-view comparison with synchronized cameras
+- Keep a compact in-view legend for change counts and visibility toggles
+
 ## Use Cases
 - **QA/QC filtering and visual inspection** - Color-code elements by validation status
+- **Model version comparison** - Review added, removed, and modified elements
 - **Pre-processing for automation APIs** - Visualize data before processing
 - **Context visualization** - Add trees, furniture, or site elements to architectural models
 - **Interactive markup** - Annotate 2D drawings with circle markers
@@ -167,6 +180,50 @@ viewer.add_plugin(trees.spec())
 viewer.show()
 ```
 
+### Compare Model Versions
+
+```python
+from aps_viewer_sdk import APSViewer, ChangesInput
+from aps_viewer_sdk.helper import get_2lo_token
+
+token = get_2lo_token("CLIENT_ID", "CLIENT_SECRET")
+viewer = APSViewer(
+    urn="urn:target-version...",
+    token=token,
+    views_selector=True,
+)
+
+changes: ChangesInput = [
+    {
+        "externalElementId": "target-external-id-1",
+        "changeType": "added",
+        "displayName": "New element",
+    },
+    {
+        "externalElementId": "base-external-id-1",
+        "changeType": "removed",
+        "displayName": "Removed element",
+    },
+    {
+        "externalElementId": "shared-external-id-1",
+        "changeType": "modified",
+        "displayName": "Modified element",
+    },
+]
+
+viewer.compare_with(
+    base_urn="urn:base-version...",
+    changes=changes,
+    base_label="Version 1",
+    target_label="Version 2",
+    default_mode="split",
+    default_visibility={"unchanged": "hidden"},
+    list_mode="none",
+)
+
+viewer.show()
+```
+
 ## Examples
 
 The `example/` folder contains comprehensive Jupyter notebooks demonstrating all features.
@@ -205,5 +262,11 @@ cp .env.example .env
 - Click-to-place circle markers on floor plans and elevations
 - Customize circle appearance (radius, color)
 - Ideal for markup and inspection workflows
+
+### 4. Compare Model Versions
+- Use `APSViewer.compare_with(...)` for split-view model comparison
+- Pass normalized `ChangesInput` items from your diff workflow
+- Color-code added, removed, and modified elements with the default palette
+- Keep unchanged elements visible or hide them for focused review
 
 Each notebook includes detailed explanations, parameter documentation, and use case examples.

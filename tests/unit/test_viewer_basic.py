@@ -3,6 +3,8 @@
 import webbrowser
 from pathlib import Path
 
+import pytest
+
 from aps_viewer_sdk import APSViewer
 from aps_viewer_sdk.helper import to_md_urn
 
@@ -34,6 +36,43 @@ def test_viewer_write_returns_html() -> None:
     assert len(html) > 0
     assert "test-token" in html
     assert to_md_urn("test-urn-12345") in html
+
+
+@pytest.mark.parametrize(
+    ("views_selector", "has_views", "expected_visible"),
+    [
+        (False, False, False),
+        (False, True, False),
+        (True, False, False),
+        (True, True, True),
+    ],
+)
+def test_view_picker_requires_enabled_selector_and_available_views(
+    monkeypatch, views_selector: bool, has_views: bool, expected_visible: bool
+) -> None:
+    viewer = APSViewer(
+        urn="test-urn-12345", token="test-token", views_selector=views_selector
+    )
+    if has_views:
+        viewer.set_view_guid("structure-view", "Structure", "3d")
+
+    fetched_urns: list[str] = []
+
+    def get_empty_viewables(urn: str) -> list[dict[str, str]]:
+        fetched_urns.append(urn)
+        return []
+
+    monkeypatch.setattr(viewer, "get_viewables", get_empty_viewables)
+    html = viewer.write()
+
+    assert f"var VIEW_SELECTOR_ENABLED = {str(expected_visible).lower()};" in html
+    assert '<div id="viewSelector" hidden>' in html
+    assert "VIEW_SELECTOR_ENABLED_PLACEHOLDER" not in html
+    assert fetched_urns == (
+        [to_md_urn(viewer.urn)] if views_selector and not has_views else []
+    )
+    if has_views:
+        assert "var SELECTED_VIEW_GUID = 'structure-view';" in html
 
 
 def test_viewer_show_creates_html_file(monkeypatch) -> None:

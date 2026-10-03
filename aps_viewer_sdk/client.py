@@ -30,7 +30,9 @@ class APSViewer:
             str, "Version URN e.g urn:adsk.wipprod:fs.file:vf.Skn9c5Q?version=1"
         ],
         token: Annotated[str, "2Lo | 3Lo token"],
-        views_selector: Annotated[bool, "Toggle a view picker"] = True,
+        views_selector: Annotated[
+            bool, "Show a view picker when model views are available"
+        ] = True,
         region: Annotated[
             str,
             "APS Model Derivative region for manifest and derivative metadata",
@@ -171,6 +173,10 @@ class APSViewer:
 
         viewables_json = json.dumps(self.viewables) if self.viewables else "[]"
         html = html.replace("VIEWABLES_PLACEHOLDER", viewables_json)
+        html = html.replace(
+            "VIEW_SELECTOR_ENABLED_PLACEHOLDER",
+            json.dumps(self.views_selector and bool(self.viewables)),
+        )
 
         selected_view_guid = self.selected_view_guid or ""
         html = html.replace("SELECTED_VIEW_GUID_PLACEHOLDER", selected_view_guid)

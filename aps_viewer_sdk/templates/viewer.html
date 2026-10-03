@@ -47,7 +47,7 @@
 </head>
 <body>
   <div id="apsViewerDiv"></div>
-  <div id="viewSelector">
+  <div id="viewSelector" hidden>
     <label for="viewDropdown">View:</label>
     <select id="viewDropdown">
       <option value="">Loading views...</option>
@@ -60,6 +60,7 @@
   var ACCESS_TOKEN = 'APS_TOKEN_PLACEHOLDER';
   var DOCUMENT_URN = 'urn:URN_PLACEHOLDER';
   var VIEWABLES = VIEWABLES_PLACEHOLDER;
+  var VIEW_SELECTOR_ENABLED = VIEW_SELECTOR_ENABLED_PLACEHOLDER;
   var SELECTED_VIEW_GUID = 'SELECTED_VIEW_GUID_PLACEHOLDER';
 
   // Injected plugins list (each item: { extensionId, only2d, options })
@@ -156,6 +157,10 @@
   }
 
   function populateViewDropdown() {
+    const selector = document.getElementById('viewSelector');
+    selector.hidden = !VIEW_SELECTOR_ENABLED || !Array.isArray(VIEWABLES) || VIEWABLES.length === 0;
+    if (selector.hidden) return false;
+
     const dropdown = document.getElementById('viewDropdown');
     dropdown.innerHTML = '';
 
@@ -165,19 +170,13 @@
     defaultOption.selected = true;
     dropdown.appendChild(defaultOption);
 
-    if (Array.isArray(VIEWABLES) && VIEWABLES.length > 0) {
-      VIEWABLES.forEach(function(viewable) {
-        const option = document.createElement('option');
-        option.value = viewable.guid;
-        option.textContent = viewable.name + ' (' + viewable.role + ')';
-        dropdown.appendChild(option);
-      });
-    } else {
-      const fallback = document.createElement('option');
-      fallback.value = '';
-      fallback.textContent = 'No additional views available';
-      dropdown.appendChild(fallback);
-    }
+    VIEWABLES.forEach(function(viewable) {
+      const option = document.createElement('option');
+      option.value = viewable.guid;
+      option.textContent = viewable.name + ' (' + viewable.role + ')';
+      dropdown.appendChild(option);
+    });
+    return true;
   }
 
   function applyExternalIdIsolationAndColoring() {
@@ -283,17 +282,17 @@
         DOCUMENT_URN,
         function onSuccess(doc) {
           loadedDocument = doc;
-          populateViewDropdown();
-
-          if (SELECTED_VIEW_GUID) {
-            document.getElementById('viewDropdown').value = SELECTED_VIEW_GUID;
+          if (populateViewDropdown()) {
+            const dropdown = document.getElementById('viewDropdown');
+            if (SELECTED_VIEW_GUID) {
+              dropdown.value = SELECTED_VIEW_GUID;
+            }
+            dropdown.addEventListener('change', function(e) {
+              loadViewByGuid(e.target.value);
+            });
           }
 
           loadViewByGuid(SELECTED_VIEW_GUID || '');
-
-          document.getElementById('viewDropdown').addEventListener('change', function(e) {
-            loadViewByGuid(e.target.value);
-          });
         },
         function onFailure(code, message) {
           console.error('Document load failed:', code, message);
